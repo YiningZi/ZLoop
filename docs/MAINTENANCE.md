@@ -47,3 +47,14 @@ GitHub Actions 会验证标签与元数据、提取对应版本说明、构建�
 ## 验证记录
 
 每次 Release 的说明应写明测试使用的 Blender 版本、自动化测试范围、实际模型验证结果和剩余限制。不能用语法检查替代插件加载或网格变形验证。
+
+## 维护示意图
+
+README 使用 `docs/images/` 中的 PNG，旁边保留可编辑 SVG。`tools/draw_feature_diagrams.py` 同时生成两个格式，使用 Pillow 和支持中文的字体。图解单独使用绘图库，插件与打包不依赖 Pillow。
+
+```bash
+python -m pip install Pillow
+python tools/draw_feature_diagrams.py --font /path/to/chinese-regular.ttf --bold-font /path/to/chinese-bold.ttf
+```
+
+Windows 默认字体路径为 `C:/Windows/Fonts/msyh.ttc` 与 `msyhbd.ttc`。修改后检查中文、注释、色彩图例和网格连接关系，确保示意图符合当前实际功能。示例尺寸和形状变化须标为原理示意；真实截图需另行标明测试模型和 Blender 版本。

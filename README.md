@@ -1,12 +1,16 @@
-# ZLA · ZLoop 环线工具
+# ZLoop 环线工具
 
 为 Blender 网格建模提供中文环线测量与周长调整。适合调整手指指围、管状网格截面等需要精确周长的局部位置。
 
 当前插件版本：**2.2.0**。最低声明版本：**Blender 4.4**。网格回归测试已在 **4.4.3 / 5.1.1** 通过。
 
+![ZLoop 功能示意：测量闭合环线，输入目标周长，进行局部平滑调整。](docs/images/feature-overview.png)
+
+上图按操作顺序展示测量、目标周长缩放和局部衰减。图中 60 → 66 mm 是示例尺寸，模型为原理示意。详细说明见 [功能图解](docs/FEATURES.md)。
+
 ## 安装
 
-1. 从 [Releases](https://github.com/YiningZi/ZLA/releases/latest) 下载 `ZLoop_Addon_2.2.0.zip`。GitHub 的“Source code”ZIP 是整个开发仓库，安装时应选择带 `ZLoop_Addon_` 前缀的插件包。
+1. 从 [Releases](https://github.com/YiningZi/ZLoop/releases/latest) 下载 `ZLoop_Addon_2.2.0.zip`。GitHub 的“Source code”ZIP 是整个开发仓库，安装时应选择带 `ZLoop_Addon_` 前缀的插件包。
 2. 在 Blender 的“编辑 → 偏好设置 → 插件”菜单选择“从磁盘安装”，选择该 ZIP 并启用插件。
 3. 在 3D 视图按 **N**，打开 **ZLoop** 标签页。
 
@@ -30,6 +34,8 @@
 | 衰减类型 | 选择平滑、球形、线性等 Blender 比例编辑曲线。 |
 
 调整指围建议同时开启 **自动衰减** 和 **仅影响相连项**。手指通过掌部相连，过大的半径仍可能传到其他手指。
+
+![关闭与开启仅影响相连项的对比：开启后沿网格路径限定局部影响，靠近的邻指不会仅因空间距离受到调整。](docs/images/connected-falloff.png)
 
 更多说明：[插件使用说明](zloop_addon/README_CN.md)、[已知限制与改进计划](docs/KNOWN_ISSUES.md)。
 
@@ -57,4 +63,4 @@ python -m unittest discover -s tests -p "test_package.py" -v
 blender --background --factory-startup --disable-autoexec --python-exit-code 1 --python tests/test_connected_blender.py
 ```
 
-[GitHub Actions](https://github.com/YiningZi/ZLA/actions) 对代码提交运行打包检查及 Blender 4.4.3 / 5.1.1 网格测试。推送与插件版本一致的 `vX.Y.Z` 标签后，通过验证的安装包和该版本说明会发布到 Releases。
+[GitHub Actions](https://github.com/YiningZi/ZLoop/actions) 对代码提交运行打包检查及 Blender 4.4.3 / 5.1.1 网格测试。推送与插件版本一致的 `vX.Y.Z` 标签后，通过验证的安装包和该版本说明会发布到 Releases。

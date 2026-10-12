@@ -8,8 +8,10 @@ tests/test_connected_blender.py   Blender 网格行为测试
 tests/test_package.py        独立 Python 打包测试
 build_release.py             打包与 SHA-256 校验
 tools/release_notes.py       从更新日志提取版本说明
+tools/draw_feature_diagrams.py    功能示意图生成脚本
 CHANGELOG.md                每个版本的变化
 docs/                       历史、已知问题与维护流程
+docs/images/                README 功能示意图（PNG 与 SVG）
 .github/workflows/          提交验证与标签发布
 ```
 

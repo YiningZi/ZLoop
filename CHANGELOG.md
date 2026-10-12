@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### 仓库维护
+
+- 更新 GitHub Actions 的 checkout、setup-python 和 upload-artifact，使用 Node.js 24 运行时并固定已核验的提交，移除旧运行时弃用提示。
+
 后续功能与修复在此登记，通过验证并确定发布版本后移动到新的版本章节。
 
 ## [2.2.0] - 2026-09-16

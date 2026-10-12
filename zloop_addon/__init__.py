@@ -22,7 +22,7 @@ class ZLOOP_OT_scale_precise(bpy.types.Operator):
     bl_label = "应用环线缩放"
     bl_description = "将选中的完整环线缩放到目标周长"
     bl_options = {'REGISTER', 'UNDO'}
-    
+
     # 目标周长控制
     target_length: FloatProperty(
         name="目标周长",
@@ -32,7 +32,7 @@ class ZLOOP_OT_scale_precise(bpy.types.Operator):
         precision=3,
         unit='LENGTH'
     )
-    
+
     # 衰减控制
     falloff_radius: FloatProperty(
         name="衰减半径",
@@ -43,7 +43,7 @@ class ZLOOP_OT_scale_precise(bpy.types.Operator):
         precision=3,
         unit='LENGTH'
     )
-    
+
     falloff_shape: EnumProperty(
         name="衰减类型",
         description="比例编辑的影响衰减方式",
@@ -58,7 +58,7 @@ class ZLOOP_OT_scale_precise(bpy.types.Operator):
         ],
         default='SMOOTH'
     )
-    
+
     # 变换约束
     constraint_mode: EnumProperty(
         name="缩放方向",
@@ -71,20 +71,20 @@ class ZLOOP_OT_scale_precise(bpy.types.Operator):
         ],
         default='NORMAL'
     )
-    
+
     # 高级选项
     use_even_offset: BoolProperty(
         name="均匀偏移",
         description="尽量保持环线顶点间距均匀",
         default=False
     )
-    
+
     preserve_shape: BoolProperty(
         name="保持形状",
         description="缩放时尽量保持原有轮廓形状",
         default=True
     )
-    
+
     auto_falloff: BoolProperty(
         name="自动衰减",
         description="根据环线曲率和相邻网格间距自动计算局部衰减半径",
@@ -99,63 +99,63 @@ class ZLOOP_OT_scale_precise(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return (context.mode == 'EDIT_MESH' and 
-                context.edit_object and 
+        return (context.mode == 'EDIT_MESH' and
+                context.edit_object and
                 context.edit_object.type == 'MESH')
 
     def execute(self, context):
         obj = context.edit_object
         original_settings = None
-        
+
         try:
             # 获取物体的世界变换矩阵
             world_matrix = obj.matrix_world
             scale_matrix = world_matrix.to_scale()
-            
+
             # 初始化BMesh
             bm = bmesh.from_edit_mesh(obj.data)
             bm.edges.ensure_lookup_table()
             bm.verts.ensure_lookup_table()
-            
+
             # 验证选择
             selected_edges = [e for e in bm.edges if e.select]
             if not selected_edges:
                 self.report({'ERROR'}, "请先选择环线边")
                 return {'CANCELLED'}
-                
+
             # 验证边环
             edge_loop = self.get_edge_loop(selected_edges)
             if not edge_loop:
                 self.report({'ERROR'}, "当前选择不是完整有效的环线")
                 return {'CANCELLED'}
-            
+
             # 计算当前周长（考虑物体缩放）
             current_perimeter = self.calculate_world_perimeter(edge_loop, world_matrix)
-            
+
             if current_perimeter <= 0.001:
                 self.report({'ERROR'}, "环线周长无效，无法进行缩放")
                 return {'CANCELLED'}
-            
+
             # 计算目标周长（转换到物体本地空间）
             avg_scale = (scale_matrix.x + scale_matrix.y + scale_matrix.z) / 3.0
             target_local = self.target_length / avg_scale
             scale_factor = target_local / (current_perimeter / avg_scale)
-            
+
             # 自动计算衰减半径
             if self.auto_falloff:
                 self.falloff_radius = self.calculate_auto_falloff(
                     edge_loop, scale_factor, world_matrix
                 )
-            
+
             # 备份原始设置
             original_settings = self.backup_transform_settings(context)
-            
+
             # 配置变换设置
             self.configure_transform_settings(context)
-            
+
             # 执行缩放
             self.perform_scaling(context, scale_factor)
-            
+
             # 验证结果
             bm = bmesh.from_edit_mesh(obj.data)
             selected_edges = [e for e in bm.edges if e.select]
@@ -165,7 +165,7 @@ class ZLOOP_OT_scale_precise(bpy.types.Operator):
                 accuracy = abs(new_perimeter - self.target_length) / self.target_length * 100
                 radius_hint = f"，自动半径 {self.falloff_radius:.3f}" if self.auto_falloff else ""
                 self.report({'INFO'}, f"环线已缩放：{current_perimeter:.3f} → {new_perimeter:.3f}（目标 {self.target_length:.3f}，精度 {100-accuracy:.1f}%{radius_hint}）")
-            
+
         except Exception as e:
             self.report({'ERROR'}, f"缩放失败：{str(e)}")
             return {'CANCELLED'}
@@ -173,63 +173,63 @@ class ZLOOP_OT_scale_precise(bpy.types.Operator):
             # 成功、失败或提前退出均恢复用户原有的比例编辑设置。
             if original_settings is not None:
                 self.restore_transform_settings(context, original_settings)
-        
+
         # 更新网格
         bmesh.update_edit_mesh(obj.data)
         return {'FINISHED'}
-    
+
     def get_edge_loop(self, selected_edges):
         """获取有效的边环"""
         if len(selected_edges) < 3:
             return None
-            
+
         # 构建顶点连接图
         vert_connections = {}
         for edge in selected_edges:
             v1, v2 = edge.verts
             vert_connections.setdefault(v1, []).append(v2)
             vert_connections.setdefault(v2, []).append(v1)
-        
+
         # 检查是否每个顶点都恰好连接两条边
         for vert, connections in vert_connections.items():
             if len(connections) != 2:
                 return None
-        
+
         # 构建有序的边环
         if not vert_connections:
             return None
-            
+
         start_vert = next(iter(vert_connections.keys()))
         ordered_loop = [start_vert]
         current_vert = vert_connections[start_vert][0]
-        
+
         while current_vert != start_vert and len(ordered_loop) < len(vert_connections):
             ordered_loop.append(current_vert)
             connections = vert_connections[current_vert]
             prev_vert = ordered_loop[-2] if len(ordered_loop) > 1 else None
             next_vert = connections[0] if connections[1] == prev_vert else connections[1]
             current_vert = next_vert
-        
+
         if len(ordered_loop) != len(vert_connections):
             return None
-            
+
         return ordered_loop
-    
+
     def calculate_world_perimeter(self, edge_loop, world_matrix):
         """计算世界空间中的周长"""
         total_length = 0.0
         for i in range(len(edge_loop)):
             v1 = edge_loop[i]
             v2 = edge_loop[(i + 1) % len(edge_loop)]
-            
+
             # 转换到世界坐标
             world_v1 = world_matrix @ v1.co
             world_v2 = world_matrix @ v2.co
-            
+
             total_length += (world_v2 - world_v1).length
-            
+
         return total_length
-    
+
     def calculate_auto_falloff(self, edge_loop, scale_factor, world_matrix=None):
         """根据曲率和局部拓扑间距计算局部、平滑的衰减半径。
 
@@ -305,7 +305,7 @@ class ZLOOP_OT_scale_precise(bpy.types.Operator):
         radius = max(radius, median_edge_length * 1.25)
 
         return max(0.001, radius)
-    
+
     def backup_transform_settings(self, context):
         """备份当前变换设置"""
         ts = context.scene.tool_settings
@@ -317,7 +317,7 @@ class ZLOOP_OT_scale_precise(bpy.types.Operator):
             'falloff_type': ts.proportional_edit_falloff,
             'pivot_point': ts.transform_pivot_point,
         }
-    
+
     def configure_transform_settings(self, context):
         """配置变换设置"""
         ts = context.scene.tool_settings
@@ -327,7 +327,7 @@ class ZLOOP_OT_scale_precise(bpy.types.Operator):
         ts.proportional_size = self.falloff_radius
         ts.proportional_edit_falloff = self.falloff_shape
         ts.transform_pivot_point = 'MEDIAN_POINT'
-    
+
     def restore_transform_settings(self, context, settings):
         """恢复变换设置"""
         ts = context.scene.tool_settings
@@ -337,16 +337,16 @@ class ZLOOP_OT_scale_precise(bpy.types.Operator):
         ts.proportional_size = settings['proportional_size']
         ts.proportional_edit_falloff = settings['falloff_type']
         ts.transform_pivot_point = settings['pivot_point']
-    
+
     def perform_scaling(self, context, scale_factor):
         """执行缩放操作"""
         constraint_axis = (False, False, False)
-        
+
         if self.constraint_mode == 'NORMAL':
             orient_type = 'NORMAL'
         else:
             orient_type = self.constraint_mode
-        
+
         bpy.ops.transform.resize(
             value=(scale_factor, scale_factor, scale_factor),
             orient_type=orient_type,
@@ -364,35 +364,35 @@ class ZLOOP_OT_analyze_loop(bpy.types.Operator):
     bl_label = "测量当前环线"
     bl_description = "统计所选环线的边数、总长度和平均边长"
     bl_options = {'REGISTER'}
-    
+
     def execute(self, context):
         obj = context.edit_object
         if not obj:
             self.report({'ERROR'}, "请在编辑模式下选择一个网格物体")
             return {'CANCELLED'}
-            
+
         bm = bmesh.from_edit_mesh(obj.data)
         selected_edges = [e for e in bm.edges if e.select]
-        
+
         if not selected_edges:
             self.report({'INFO'}, "当前没有选择任何边")
             return {'FINISHED'}
-        
+
         # 计算基本信息
         world_matrix = obj.matrix_world
         total_length = 0.0
-        
+
         for edge in selected_edges:
             v1_world = world_matrix @ edge.verts[0].co
             v2_world = world_matrix @ edge.verts[1].co
             total_length += (v2_world - v1_world).length
-        
+
         edge_count = len(selected_edges)
         avg_length = total_length / edge_count if edge_count > 0 else 0
-        
-        self.report({'INFO'}, 
+
+        self.report({'INFO'},
                    f"环线测量：{edge_count} 条边，总长度 {total_length:.3f}，平均边长 {avg_length:.3f}")
-        
+
         return {'FINISHED'}
 
 class ZLOOP_PT_main_panel(bpy.types.Panel):
@@ -402,16 +402,16 @@ class ZLOOP_PT_main_panel(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'ZLoop'
-    
+
     @classmethod
     def poll(cls, context):
         # 面板始终显示，避免用户因模式或选择状态找不到工具按钮。
         return True
-    
+
     def draw(self, context):
         layout = self.layout
         scene = context.scene
-        
+
         layout.use_property_split = True
         layout.use_property_decorate = False
 
@@ -476,7 +476,7 @@ class ZLOOP_PT_main_panel(bpy.types.Panel):
         op.use_even_offset = scene.zloop_use_even_offset
         op.auto_falloff = scene.zloop_auto_falloff
         op.use_connected = scene.zloop_use_connected
-        
+
         inspect = layout.row()
         inspect.scale_y = 1.1
         inspect.operator("mesh.zloop_analyze", text="测量当前环线", icon='VIEWZOOM')
@@ -490,14 +490,14 @@ class ZLOOP_PT_info_panel(bpy.types.Panel):
     bl_category = 'ZLoop'
     bl_parent_id = "ZLOOP_PT_main"
     bl_options = {'DEFAULT_CLOSED'}
-    
+
     @classmethod
     def poll(cls, context):
         return True
-    
+
     def draw(self, context):
         layout = self.layout
-        
+
         layout.use_property_decorate = False
         box = layout.box()
         box.label(text="操作提示", icon='INFO')
@@ -599,7 +599,7 @@ def _register_scene_properties():
         unit='LENGTH',
         update=update_target_length
     )
-    
+
     # 衰减半径
     bpy.types.Scene.zloop_falloff_radius = FloatProperty(
         name="衰减半径",
@@ -610,7 +610,7 @@ def _register_scene_properties():
         precision=3,
         unit='LENGTH'
     )
-    
+
     # 衰减形状
     bpy.types.Scene.zloop_falloff_shape = EnumProperty(
         name="衰减类型",
@@ -625,7 +625,7 @@ def _register_scene_properties():
         ],
         default='SMOOTH'
     )
-    
+
     # 约束模式
     bpy.types.Scene.zloop_constraint_mode = EnumProperty(
         name="缩放方向",
@@ -637,20 +637,20 @@ def _register_scene_properties():
         ],
         default='NORMAL'
     )
-    
+
     # 高级选项
     bpy.types.Scene.zloop_preserve_shape = BoolProperty(
         name="保持形状",
         description="缩放时尽量保持原有轮廓形状",
         default=True
     )
-    
+
     bpy.types.Scene.zloop_use_even_offset = BoolProperty(
         name="均匀偏移",
         description="尽量保持环线顶点间距均匀",
         default=False
     )
-    
+
     bpy.types.Scene.zloop_auto_falloff = BoolProperty(
         name="自动衰减",
         description="根据环线曲率和相邻网格间距自动计算局部衰减半径",
@@ -662,7 +662,7 @@ def _register_scene_properties():
         description="沿网格连接计算衰减，避免影响空间上靠近的其他部位；半径过大时仍可能经掌部影响相邻手指",
         default=True
     )
-    
+
 
 def register():
     print("Registering ZLoop V2.2...")

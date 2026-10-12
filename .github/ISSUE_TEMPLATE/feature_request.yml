@@ -1,0 +1,21 @@
+name: 功能建议
+description: 提出建模工作流或插件交互改进
+title: "[建议] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 当前遇到的问题
+      description: 描述具体建模场景和当前操作的困难。
+    validations:
+      required: true
+  - type: textarea
+    id: desired
+    attributes:
+      label: 希望增加或改变的行为
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: 示例或替代方案

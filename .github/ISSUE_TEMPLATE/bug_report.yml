@@ -1,0 +1,43 @@
+name: 错误报告
+description: 报告插件加载、测量、变形或卸载问题
+title: "[错误] "
+body:
+  - type: input
+    id: blender_version
+    attributes:
+      label: Blender 版本
+      placeholder: 例如 4.4.3 / 5.1.1
+    validations:
+      required: true
+  - type: input
+    id: addon_version
+    attributes:
+      label: 插件版本
+      placeholder: 例如 2.2.0
+    validations:
+      required: true
+  - type: input
+    id: operating_system
+    attributes:
+      label: 操作系统
+      placeholder: 例如 Windows 11
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤与参数
+      description: 说明选择的环线、编辑模式、目标周长、自动衰减、相连开关及半径。
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期结果
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际结果
+      description: 可附报错、截图或可分享的最小模型。
+    validations:
+      required: true

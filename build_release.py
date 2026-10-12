@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 YiningZi (SeventhSlice)
+
 """Build a reproducible Blender add-on ZIP using only the Python standard library."""
 import argparse
 import ast
@@ -7,7 +10,12 @@ import zipfile
 
 
 ROOT = Path(__file__).resolve().parent
-PACKAGE_FILES = ("__init__.py", "README_CN.md")
+PACKAGE_FILES = ("__init__.py", "README_CN.md", "LICENSE")
+
+
+def package_source(root, name):
+    # Keep a single canonical license; copy it into the installed add-on.
+    return root / "LICENSE" if name == "LICENSE" else root / "zloop_addon" / name
 
 
 def package_contents(path):
@@ -40,7 +48,7 @@ def build_release(output_dir=None, root=ROOT):
     output = output_dir / f"ZLoop_Addon_{version}.zip"
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for name in PACKAGE_FILES:
-            source = root / "zloop_addon" / name
+            source = package_source(root, name)
             contents = package_contents(source)
             if name.endswith(".py"):
                 ast.parse(contents, filename=str(source))
@@ -57,7 +65,7 @@ def build_release(output_dir=None, root=ROOT):
         if set(archive.namelist()) != expected:
             raise ValueError("Unexpected release contents")
         for name in PACKAGE_FILES:
-            if archive.read(f"zloop_addon/{name}") != package_contents(root / "zloop_addon" / name):
+            if archive.read(f"zloop_addon/{name}") != package_contents(package_source(root, name)):
                 raise ValueError(f"Release source mismatch: {name}")
     digest = hashlib.sha256(output.read_bytes()).hexdigest()
     (output_dir / "SHA256SUMS.txt").write_text(f"{digest}  {output.name}\n", encoding="utf-8")

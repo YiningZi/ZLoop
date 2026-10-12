@@ -1,7 +1,23 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 YiningZi (SeventhSlice)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
 bl_info = {
     "name": "ZLoop 环线精确测量与缩放",
     "author": "YiningZi - Enhanced Version",
-    "version": (2, 2, 0),
+    "version": (2, 2, 1),
     "blender": (4, 4, 0),
     "location": "View3D > Sidebar > ZLoop",
     "description": "用于精确测量环线周长并进行比例缩放的建模工具",
@@ -665,7 +681,7 @@ def _register_scene_properties():
 
 
 def register():
-    print("Registering ZLoop V2.2...")
+    print("Registering ZLoop V2.2.1...")
     _cleanup_previous_registration()
     try:
         _register_scene_properties()
@@ -676,14 +692,14 @@ def register():
         _tag_all_areas_for_redraw()
         raise
     _tag_all_areas_for_redraw()
-    print("ZLoop V2.2 registered successfully!")
+    print("ZLoop V2.2.1 registered successfully!")
 
 def unregister():
-    print("Unregistering ZLoop V2.2...")
+    print("Unregistering ZLoop V2.2.1...")
     _unregister_stale_classes()
     _remove_scene_properties(clear_values=True)
     _tag_all_areas_for_redraw()
-    print("ZLoop V2.2 unregistered successfully!")
+    print("ZLoop V2.2.1 unregistered successfully!")
 
 if __name__ == "__main__":
     register()

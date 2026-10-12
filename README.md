@@ -2,7 +2,7 @@
 
 为 Blender 网格建模提供中文环线测量与周长调整。适合调整手指指围、管状网格截面等需要精确周长的局部位置。
 
-当前插件版本：**2.2.0**。最低声明版本：**Blender 4.4**。网格回归测试已在 **4.4.3 / 5.1.1** 通过。
+当前插件版本：**2.2.1**。最低声明版本：**Blender 4.4**。网格回归测试已在 **4.4.3 / 5.1.1** 通过。
 
 ![ZLoop 功能示意：测量闭合环线，输入目标周长，进行局部平滑调整。](docs/images/feature-overview.png)
 
@@ -10,7 +10,7 @@
 
 ## 安装
 
-1. 从 [Releases](https://github.com/YiningZi/ZLoop/releases/latest) 下载 `ZLoop_Addon_2.2.0.zip`。GitHub 的“Source code”ZIP 是整个开发仓库，安装时应选择带 `ZLoop_Addon_` 前缀的插件包。
+1. 从 [Releases](https://github.com/YiningZi/ZLoop/releases/latest) 下载 `ZLoop_Addon_2.2.1.zip`。GitHub 的“Source code”ZIP 是整个开发仓库，安装时应选择带 `ZLoop_Addon_` 前缀的插件包。
 2. 在 Blender 的“编辑 → 偏好设置 → 插件”菜单选择“从磁盘安装”，选择该 ZIP 并启用插件。
 3. 在 3D 视图按 **N**，打开 **ZLoop** 标签页。
 
@@ -44,7 +44,15 @@
 - [版本更新日志](CHANGELOG.md)：按版本记录新增、修复、行为变化及验证情况。
 - [贡献与修改指南](CONTRIBUTING.md)：修改代码、运行验证与提交问题的方法。
 - [维护与发布流程](docs/MAINTENANCE.md)：版本号、打包、标签和 Release 的管理。
-- [历史版本记录](docs/VERSION_HISTORY.md)：原始 2.0.0、2.1.0 以及 2.2.0 的来源与归档范围。
+- [历史版本记录](docs/VERSION_HISTORY.md)：各版本的来源与归档范围。
+
+## 许可证
+
+Copyright (C) 2026 YiningZi (SeventhSlice)。
+
+本仓库的源码、文档和原创示意图采用 **GNU GPL v3 或更新版本**（`GPL-3.0-or-later`），另有声明的部分除外。你可以使用、修改和分发，也可以用于商业用途；分发插件或修改版本时，须按 GPL 提供对应源码并保留版权与许可证声明。软件不附带担保。
+
+许可证完整条款见 [LICENSE](LICENSE)。从 **2.2.1** 起，安装包内包含 `zloop_addon/LICENSE`；旧版安装包的内容保持原样。
 
 ## 本地构建
 

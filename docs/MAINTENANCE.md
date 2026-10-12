@@ -8,6 +8,7 @@
 - 注册/注销新增属性、类、定时器或回调时，必须同时实现清理与重复注册验证。
 - 整理仓库或文档可沿用当前插件版本；改变插件行为时增加版本号。
 - 工作流依赖使用已核验的固定提交；更新运行时依赖后重新验证 Actions，避免保留弃用配置。
+- 根目录 LICENSE 是完整许可文本的唯一来源，打包脚本将其复制到安装目录；发布包须保留版权与 SPDX 声明。
 
 ## 版本编号
 
@@ -21,7 +22,7 @@
 
 ```bash
 python -m unittest discover -s tests -p "test_package.py" -v
-python tools/release_notes.py --version 2.2.0 --output dist/release-notes.md
+python tools/release_notes.py --version 2.2.1 --output dist/release-notes.md
 python build_release.py
 ```
 

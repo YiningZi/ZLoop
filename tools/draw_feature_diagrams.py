@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 YiningZi (SeventhSlice)
+
 """Generate editable SVG and antialiased PNG feature diagrams (Pillow required)."""
 import argparse
 import html

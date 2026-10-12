@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 YiningZi (SeventhSlice)
+
 """Download the specified official Linux Blender build and verify its SHA-256."""
 import argparse
 import hashlib

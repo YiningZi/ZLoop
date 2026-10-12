@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 YiningZi (SeventhSlice)
+
 """Extract the current version's Chinese release notes and validate a release tag."""
 import argparse
 from pathlib import Path

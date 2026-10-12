@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 YiningZi (SeventhSlice)
+
 """Run with Blender --background --factory-startup --python-exit-code 1 --python this_file.
 
 Uses actual mesh edits, including two nearby fingers joined at the palm.
